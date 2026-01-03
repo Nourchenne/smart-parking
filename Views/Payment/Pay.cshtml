@@ -1,0 +1,42 @@
+@model auth.Models.FakePayViewModel
+@{
+    ViewData["Title"] = "Paiement (Simulation)";
+}
+
+<div class="container mt-4">
+    <h2>Paiement (Simulation)</h2>
+
+    <div class="card p-3 mt-3">
+        <p><b>Réservation :</b> @Model.ReservationId</p>
+        <p><b>Montant :</b> @Model.Amount @Model.Currency</p>
+        <p><b>Réf transaction :</b> @Model.FakeRef</p>
+        <p><b>Statut :</b> @Model.CurrentStatus</p>
+    </div>
+
+    <div class="mt-4">
+        @if (Model.CurrentStatus == "Pending")
+        {
+            <form asp-action="Succeed" method="post" onsubmit="return confirm('Confirmer et effectuer le paiement ?');">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="reservationId" value="@Model.ReservationId" />
+                <button class="btn btn-success">Payer maintenant</button>
+                <a class="btn btn-outline-secondary ms-2" asp-controller="Reservations" asp-action="Details" asp-route-id="@Model.ReservationId">Annuler</a>
+            </form>
+        }
+        else if (Model.CurrentStatus == "Paid")
+        {
+            <div class="d-flex gap-2">
+                <a class="btn btn-primary" asp-controller="Payment" asp-action="DownloadReceipt" asp-route-reservationId="@Model.ReservationId">Télécharger le reçu (PDF)</a>
+                <a class="btn btn-secondary" asp-controller="Reservations" asp-action="Details" asp-route-id="@Model.ReservationId">Voir la réservation</a>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-danger">Le paiement a échoué ou est dans un état inconnu.</div>
+            <div class="d-flex gap-2">
+                <a class="btn btn-primary" asp-controller="Payment" asp-action="Pay" asp-route-reservationId="@Model.ReservationId">Réessayer</a>
+                <a class="btn btn-secondary" asp-controller="Reservations" asp-action="Details" asp-route-id="@Model.ReservationId">Voir la réservation</a>
+            </div>
+        }
+    </div>
+</div>

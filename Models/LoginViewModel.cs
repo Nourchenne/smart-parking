@@ -16,5 +16,11 @@ namespace auth.Models
 
         [Display(Name = "Se souvenir de moi")]
         public bool RememberMe { get; set; }
+
+        // Choix du type de compte : User ou Manager
+        [Required(ErrorMessage = "Veuillez choisir le type de compte")]
+        [Display(Name = "Type de compte")]
+        [RegularExpression("User|Manager", ErrorMessage = "Type de compte invalide")]
+        public string SelectedRole { get; set; } = "User";
     }
 }

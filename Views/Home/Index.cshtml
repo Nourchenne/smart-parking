@@ -1,8 +1,86 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Smart Parking";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<section class="sp-hero">
+    <div class="container sp-hero-content">
+        <div>
+            <span class="sp-badge">⚡ Smart Parking</span>
+            <h1>Gérez et réservez des places de parking en un clin d'œil</h1>
+            <p class="lead">Trouvez les parkings disponibles près de vous, réservez en quelques secondes et suivez l'occupation en temps réel.</p>
+
+            <div class="sp-hero-actions">
+                <a class="sp-btn sp-btn-primary" asp-controller="Account" asp-action="Register">Créer un compte</a>
+                <a class="sp-btn sp-btn-outline" asp-controller="Account" asp-action="Login">Se connecter</a>
+                <a class="sp-btn sp-btn-light" asp-controller="Account" asp-action="Login">Voir les parkings</a>
+            </div>
+
+            <div class="sp-stats mt-4">
+                <div class="sp-stat">
+                    <div class="sp-stat-value">1 250+</div>
+                    <div class="sp-stat-label">Places gérées</div>
+                </div>
+                <div class="sp-stat">
+                    <div class="sp-stat-value">98%</div>
+                    <div class="sp-stat-label">Taux d'occupation optimisé</div>
+                </div>
+                <div class="sp-stat">
+                    <div class="sp-stat-value">4.9/5</div>
+                    <div class="sp-stat-label">Satisfaction utilisateur</div>
+                </div>
+            </div>
+
+           
+        </div>
+
+        <div class="sp-hero-image text-center">
+            <img src="~/img/hero-parking.jpg" alt="Smart Parking" />
+        </div>
+    </div>
+</section>
+
+<section class="sp-section">
+    <div class="container">
+        <div class="sp-section-header">
+            <h2>Fonctionnalités clés</h2>
+            <p>Des outils conçus pour simplifier la gestion et l'expérience des conducteurs comme des managers.</p>
+        </div>
+
+        <div class="sp-grid">
+            <div class="sp-card text-center">
+                <div class="sp-card-icon">📍</div>
+                <h3>Recherche intelligente</h3>
+                <p>Trouvez les parkings selon la distance, le prix et la disponibilité en temps réel.</p>
+            </div>
+
+            <div class="sp-card text-center">
+                <div class="sp-card-icon">🕒</div>
+                <h3>Réservation instantanée</h3>
+                <p>Réservez votre place et recevez une confirmation immédiate sur votre mobile.</p>
+            </div>
+
+            <div class="sp-card text-center">
+                <div class="sp-card-icon">📊</div>
+                <h3>Tableau de bord</h3>
+                <p>Suivez l'occupation et les performances de vos parkings avec des graphiques clairs.</p>
+            </div>
+
+            <div class="sp-card text-center">
+                <div class="sp-card-icon">🔒</div>
+                <h3>Sécurité & Paiement</h3>
+                <p>Transactions sécurisées et gestion des accès pour garantir la tranquillité d'esprit.</p>
+            </div>
+        </div>
+
+        <div class="sp-cta mt-5">
+            <div>
+                <h3>Commencez maintenant</h3>
+                <p>Créez un compte gratuit et gérez vos premières réservations en moins de 5 minutes.</p>
+            </div>
+            <div class="sp-cta-actions">
+                <a class="sp-btn sp-btn-primary" asp-controller="Account" asp-action="Register">S'inscrire</a>
+                <a class="sp-btn sp-btn-outline" asp-controller="Account" asp-action="Login">Se connecter</a>
+            </div>
+        </div>
+    </div>
+</section>

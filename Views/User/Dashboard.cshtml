@@ -1,0 +1,133 @@
+@using System.Linq
+@model IEnumerable<auth.Models.Parking>
+
+@{
+    ViewData["Title"] = "Propositions de parkings";
+    var q = ViewBag.Q as string ?? "";
+}
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<div class="container py-4">
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+        <div>
+            <h1 class="mb-1">Propositions de parkings</h1>
+            <div class="text-muted">
+                Filtrez par nom de parking ou par nom/code de place, puis cliquez sur Réserver.
+            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <a class="sp-btn sp-btn-outline"
+               asp-controller="Reservations"
+               asp-action="MyReservations">
+                Mes réservations
+            </a>
+
+            <form asp-controller="User" asp-action="Logout" method="post" class="d-inline">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="sp-btn sp-btn-light">Déconnexion</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Recherche unique -->
+    <form method="get" asp-controller="User" asp-action="Dashboard" class="row g-2 mb-4">
+        <div class="col-md-8">
+            <input type="text"
+                   name="q"
+                   value="@q"
+                   class="form-control sp-input"
+                   placeholder="Rechercher par nom de parking ou place (ex: Mosquée, A01, EV, Handicap...)" />
+        </div>
+
+        <div class="col-md-4 d-flex gap-2">
+            <button class="sp-btn sp-btn-primary flex-grow-1" type="submit">Rechercher</button>
+
+            <a class="sp-btn sp-btn-outline"
+               asp-controller="User"
+               asp-action="Dashboard">
+                Réinitialiser
+            </a>
+        </div>
+    </form>
+
+    <!-- Liste parkings -->
+    @if (Model == null || !Model.Any())
+    {
+        <div class="card p-4 text-center">
+            <p class="mb-0">Aucun parking trouvé.</p>
+        </div>
+    }
+    else
+    {
+        <div class="row g-3">
+            @foreach (var p in Model)
+            {
+                var lat = p.Latitude;
+                var lng = p.Longitude;
+            <div class="col-md-6 col-lg-4">
+                <div class="card p-3 h-100">
+                    <h5 class="mb-1">@p.Name</h5>
+
+                    <div class="text-muted small mb-2">
+                        @(string.IsNullOrWhiteSpace(p.Address) ? "Adresse non renseignée" : p.Address)
+                    </div>
+
+                    <div class="small text-muted mb-2">
+                        Places : @(p.Spots?.Count(s => s.IsActive) ?? 0)
+                    </div>
+
+                    <div style="height:160px;border-radius:8px;overflow:hidden;margin-bottom:12px;">
+                        <div id="map-@p.Id" style="height:100%;width:100%;"></div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <a class="sp-btn sp-btn-primary"
+                           asp-controller="Reservations"
+                           asp-action="Create"
+                           asp-route-parkingId="@p.Id">
+                            Réserver
+                        </a>
+                    </div>
+                </div>
+            </div>
+            }
+        </div>
+    }
+
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    (function(){
+        // Initialize small maps for each parking card
+        const parks = [];
+        @foreach (var p in Model)
+        {
+            <text>parks.push({ id: '@("map-" + p.Id)', lat: @((double)p.Latitude), lng: @((double)p.Longitude) });</text>
+        }
+
+        parks.forEach(function(item){
+            try {
+                // fallback coords
+                let lat = item.lat || 36.8065;
+                let lng = item.lng || 10.1815;
+                const map = L.map(item.id, { attributionControl: false, zoomControl: false }).setView([lat, lng], 15);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+                L.marker([lat, lng]).addTo(map);
+                // disable interaction to keep card usable
+                map.dragging.disable();
+                map.touchZoom.disable();
+                map.doubleClickZoom.disable();
+                map.scrollWheelZoom.disable();
+                map.boxZoom.disable();
+                map.keyboard.disable();
+                if (map.tap) map.tap.disable();
+            } catch (e) {
+                console && console.error(e);
+            }
+        });
+    })();
+</script>

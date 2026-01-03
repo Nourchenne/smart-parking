@@ -1,6 +1,50 @@
 ﻿@{
-    ViewData["Title"] = "Privacy Policy";
+    ViewData["Title"] = "Privacy";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<section class="sp-section">
+    <div class="container">
+        <div class="sp-section-header">
+            <h2>Politique de confidentialité</h2>
+            <p>Cette application est une démo/projet. Voici comment les données sont utilisées.</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0" style="border-radius:16px;">
+                    <div class="card-body p-4">
+                        <h4 class="mb-3"><i class="bi bi-shield-lock"></i> Données collectées</h4>
+                        <ul class="mb-4">
+                            <li>Compte : email, identifiant utilisateur (Identity).</li>
+                            <li>Parking/Places : informations saisies par les managers.</li>
+                            <li>Réservations/Paiement (simulation) : statut, montant, dates.</li>
+                        </ul>
+
+                        <h4 class="mb-3"><i class="bi bi-lock"></i> Sécurité</h4>
+                        <p>
+                            Les mots de passe sont gérés par ASP.NET Identity (hashés).
+                            L’accès aux fonctionnalités dépend du rôle (User / Manager / SuperAdmin).
+                        </p>
+
+                        <h4 class="mb-3"><i class="bi bi-trash"></i> Suppression</h4>
+                        <p class="mb-0">
+                            En mode démo, la suppression des données peut être réalisée via la base de données ou
+                            via une fonctionnalité d’administration (à ajouter si nécessaire).
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="sp-card" style="height:100%;">
+                    <div class="sp-card-icon"><i class="bi bi-info-circle"></i></div>
+                    <h3>Note</h3>
+                    <p class="text-center">
+                        Cette politique est adaptée à un projet local.
+                        Pour une mise en production : RGPD, cookies, consentement, logs, etc.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

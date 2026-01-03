@@ -1,0 +1,91 @@
+@model auth.Models.ManageViewModel
+@{
+    ViewData["Title"] = "Mon compte";
+}
+
+<div class="container py-4">
+    <h2>Mon compte</h2>
+
+    <div class="row g-3">
+        <div class="col-lg-6">
+            <div class="sp-card p-3">
+                <h5 class="mb-3">Informations du compte</h5>
+
+                <div class="mb-3">
+                    <label class="form-label">Rôle</label>
+                    <div class="form-control-plaintext">@(
+                        User.IsInRole("SuperAdmin") ? "SuperAdmin" :
+                        User.IsInRole("Manager") ? "Manager" : "Utilisateur")
+                    </div>
+                </div>
+
+                <form asp-action="UpdateProfile" method="post" class="disable-on-submit">
+                    @Html.AntiForgeryToken()
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input asp-for="Email" class="form-control" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button class="sp-btn sp-btn-primary" type="submit">Enregistrer</button>
+                        <a class="sp-btn sp-btn-outline" asp-controller="Home" asp-action="Index">Retour</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="sp-card p-3">
+                <h5 class="mb-3">Sécurité</h5>
+
+                <form asp-action="ChangePassword" method="post" class="disable-on-submit">
+                    @Html.AntiForgeryToken()
+
+                    @if (Model.HasPassword)
+                    {
+                        <div class="mb-3">
+                            <label class="form-label">Mot de passe actuel</label>
+                            <input name="CurrentPassword" class="form-control" type="password" autocomplete="current-password" />
+                        </div>
+                    }
+
+                    <div class="mb-3">
+                        <label class="form-label">Nouveau mot de passe</label>
+                        <input name="NewPassword" class="form-control" type="password" autocomplete="new-password" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Confirmer le mot de passe</label>
+                        <input name="ConfirmPassword" class="form-control" type="password" autocomplete="new-password" />
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button class="sp-btn sp-btn-primary" type="submit">Changer le mot de passe</button>
+                        <button type="button" class="sp-btn sp-btn-outline" id="showPasswordRules">Règles</button>
+                    </div>
+
+                    <div id="passwordRules" class="mt-3 text-muted" style="display:none;">
+                        <div>- Minimum 6 caractères</div>
+                        <div>- Utiliser des lettres et des chiffres pour plus de sécurité</div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a class="sp-btn sp-btn-light" asp-controller="Account" asp-action="Logout" onclick="event.preventDefault(); document.getElementById('logoutForm').submit();">Se déconnecter</a>
+        <form id="logoutForm" asp-controller="Account" asp-action="Logout" method="post" style="display:none;">@Html.AntiForgeryToken()</form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.getElementById('showPasswordRules').addEventListener('click', function(){
+            var el = document.getElementById('passwordRules');
+            if (el.style.display === 'none') el.style.display = 'block'; else el.style.display = 'none';
+        });
+    </script>
+}

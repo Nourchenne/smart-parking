@@ -1,0 +1,32 @@
+﻿@{
+    ViewData["Title"] = "Connexion SuperAdmin";
+}
+
+<section class="sp-section">
+    <div class="container" style="max-width:520px;">
+        <div class="sp-auth-card">
+            <div class="sp-auth-header">
+                <span class="sp-badge">🛡️ SuperAdmin</span>
+                <h2 class="sp-auth-title text-danger">Espace d'administration</h2>
+                <p class="sp-auth-subtitle">Connexion sécurisée réservée aux administrateurs.</p>
+            </div>
+
+            <form asp-action="Login" method="post" class="sp-auth-form">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="mb-3">
+                    <label class="form-label sp-label">Email</label>
+                    <input name="email" class="form-control sp-input" placeholder="admin@smartparking.com" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label sp-label">Mot de passe</label>
+                    <input name="password" type="password" class="form-control sp-input" placeholder="••••••••" />
+                </div>
+
+                <button class="sp-btn sp-btn-primary w-100">Connexion SuperAdmin</button>
+            </form>
+        </div>
+    </div>
+</section>

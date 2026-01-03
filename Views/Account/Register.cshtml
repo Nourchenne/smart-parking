@@ -1,41 +1,55 @@
-﻿@{
-    ViewData["Title"] = "Créer un compte Admin";
+﻿@model auth.Models.RegisterViewModel
+
+@{
+    ViewData["Title"] = "Créer un compte";
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card shadow">
-            <div class="card-header bg-primary text-white">
-                <h4 class="mb-0">Création de compte Administrateur</h4>
+<section class="sp-section">
+    <div class="container" style="max-width: 520px;">
+        <div class="sp-auth-card">
+            <div class="sp-auth-header">
+                <span class="sp-badge">📝 Inscription</span>
+                <h2 class="sp-auth-title">Créer votre compte</h2>
+                <p class="sp-auth-subtitle">Rejoignez Smart Parking et gérez vos réservations facilement.</p>
             </div>
-            <div class="card-body">
-                <form asp-action="Register" method="post">
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-                    <div class="form-group mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" id="email" name="email" class="form-control" required />
-                    </div>
+            <form asp-action="Register" method="post" class="sp-auth-form">
+                <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
-                    <div class="form-group mb-3">
-                        <label for="password" class="form-label">Mot de passe</label>
-                        <input type="password" id="password" name="password" class="form-control" required />
-                    </div>
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label sp-label"></label>
+                    <input asp-for="Email" class="form-control sp-input" placeholder="ex: name@email.com" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
 
-                    <div class="form-group mb-3">
-                        <label for="confirmPassword" class="form-label">Confirmer le mot de passe</label>
-                        <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" required />
-                    </div>
+                <div class="mb-3">
+                    <label asp-for="Password" class="form-label sp-label"></label>
+                    <input asp-for="Password" class="form-control sp-input" placeholder="Mot de passe" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
 
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-primary w-100">Créer le compte Admin</button>
-                    </div>
+                <div class="mb-3">
+                    <label asp-for="ConfirmPassword" class="form-label sp-label"></label>
+                    <input asp-for="ConfirmPassword" class="form-control sp-input" placeholder="Confirmer le mot de passe" />
+                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                </div>
 
-                    <div class="text-center mt-3">
-                        <p>Déjà un compte ? <a asp-action="Login">Se connecter</a></p>
-                    </div>
-                </form>
-            </div>
+                <div class="mb-3">
+                    <label asp-for="SelectedRole" class="form-label sp-label"></label>
+                    <select asp-for="SelectedRole" class="form-select sp-input">
+                        <option value="User">Utilisateur</option>
+                        <option value="Manager">Manager (Gérant)</option>
+                    </select>
+                    <span asp-validation-for="SelectedRole" class="text-danger"></span>
+                </div>
+
+                <button type="submit" class="sp-btn sp-btn-primary w-100">Créer le compte</button>
+
+                <div class="text-center mt-3">
+                    <span class="sp-muted">Déjà un compte ?</span>
+                    <a class="sp-link" asp-action="Login">Se connecter</a>
+                </div>
+            </form>
         </div>
     </div>
-</div>
+</section>

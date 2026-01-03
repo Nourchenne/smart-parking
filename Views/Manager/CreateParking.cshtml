@@ -1,0 +1,219 @@
+﻿@model auth.ViewModels.Manager.CreateParkingViewModel
+@{
+    ViewData["Title"] = "Ajouter un parking";
+}
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<div class="container py-4">
+    <div class="mb-3">
+        <h2 class="mb-1">Ajouter un parking</h2>
+        <p class="text-muted mb-0">
+            Remplissez les informations, choisissez l’emplacement sur la carte, et saisissez les paramètres des places.
+            Le système générera automatiquement les places au moment de l’enregistrement.
+        </p>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-5">
+            <div class="sp-card p-3">
+                <form asp-action="CreateParking" method="post" id="createForm">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Nom</label>
+                        <input asp-for="Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Adresse</label>
+                        <input asp-for="Address" class="form-control" />
+                        <span asp-validation-for="Address" class="text-danger"></span>
+                    </div>
+
+                    <div class="row g-2">
+                        <div class="col">
+                            <label class="form-label">Latitude</label>
+                            <input type="text" class="form-control" id="lat" name="LatitudeString" value="@(Model?.LatitudeString ?? string.Empty)" />
+                            <span class="text-danger" data-valmsg-for="LatitudeString"></span>
+                        </div>
+                        <div class="col">
+                            <label class="form-label">Longitude</label>
+                            <input type="text" class="form-control" id="lng" name="LongitudeString" value="@(Model?.LongitudeString ?? string.Empty)" />
+                            <span class="text-danger" data-valmsg-for="LongitudeString"></span>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <!-- =========================
+                         PLACES (AUTO, SANS BOUTONS)
+                         Champs demandés :
+                         - Dernier secteur (ex: G)
+                         - Places / secteur (ex: 50)
+                         - Prix
+                         - Type
+                         Génère automatiquement A01..A50, B01..B50, ... jusqu'à la lettre.
+                         ========================= -->
+
+                    <h5>Places (automatique)</h5>
+
+                    <div class="mb-3">
+                        <label class="form-label">Dernier secteur (A → ...)</label>
+                        <input id="lastSector" class="form-control" maxlength="1" value="A" placeholder="Ex: G" />
+                        <div class="form-text">Exemple : si vous mettez G, le système générera A..G.</div>
+                    </div>
+
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <label class="form-label">Places par secteur</label>
+                            <input id="spotsPerSector" class="form-control" type="number" min="1" value="10" />
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Prix / heure</label>
+                            <input id="autoPrice" class="form-control" type="text" placeholder="Ex: 2.50" />
+                        </div>
+                    </div>
+
+                    <div class="mt-2 mb-3">
+                        <label class="form-label">Type</label>
+                        <input id="autoType" class="form-control" placeholder="Standard" />
+                        <div class="form-text">
+                            La génération des places se fait automatiquement lors de l’enregistrement.
+                        </div>
+                    </div>
+
+                    <!-- Conteneur caché : les inputs Spots[i] seront créés ici automatiquement au submit -->
+                    <div id="spotsContainer" style="display:none;"></div>
+
+                    <div class="mt-3 d-flex gap-2">
+                        <button class="sp-btn sp-btn-primary" type="submit">
+                            <i class="bi bi-check2-circle"></i> Enregistrer
+                        </button>
+                        <a class="sp-btn sp-btn-outline" asp-controller="Manager" asp-action="Dashboard">
+                            Annuler
+                        </a>
+                    </div>
+
+                    <p class="text-muted small mt-3 mb-0">
+                        Astuce : cliquez sur la carte pour remplir Latitude/Longitude.
+                    </p>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="sp-card p-3">
+                <div id="map" style="height:420px;border-radius:12px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    // =========================
+    // MAP
+    // =========================
+    const defaultLat = 36.8065;
+    const defaultLng = 10.1815;
+
+    const latInput = document.getElementById("lat");
+    const lngInput = document.getElementById("lng");
+
+    const initLat = latInput && latInput.value
+        ? parseFloat(latInput.value.toString().replace(',', '.'))
+        : defaultLat;
+
+    const initLng = lngInput && lngInput.value
+        ? parseFloat(lngInput.value.toString().replace(',', '.'))
+        : defaultLng;
+
+    const map = L.map('map').setView([initLat, initLng], 12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
+
+    let marker = L.marker([initLat, initLng], { draggable: true }).addTo(map);
+
+    function setMarker(lat, lng) {
+        marker.setLatLng([lat, lng]);
+        if (latInput) latInput.value = lat.toFixed(6).replace(/,/g, '.');
+        if (lngInput) lngInput.value = lng.toFixed(6).replace(/,/g, '.');
+    }
+
+    map.on('click', function (e) { setMarker(e.latlng.lat, e.latlng.lng); });
+    marker.on('dragend', function (e) {
+        const pos = e.target.getLatLng();
+        setMarker(pos.lat, pos.lng);
+    });
+
+    // =========================
+    // PLACES AUTO AU SUBMIT
+    // =========================
+    const form = document.getElementById('createForm');
+    const spotsContainer = document.getElementById('spotsContainer');
+
+    function normalizeDecimal(v) {
+        return (v || '').toString().trim().replace(/,/g, '.');
+    }
+
+    function padSize(n) {
+        if (n >= 100) return 3;
+        if (n >= 10) return 2;
+        return 1;
+    }
+
+    function charRange(startChar, endChar) {
+        const start = startChar.charCodeAt(0);
+        const end = endChar.charCodeAt(0);
+        const arr = [];
+        for (let i = start; i <= end; i++) arr.push(String.fromCharCode(i));
+        return arr;
+    }
+
+    function addHiddenSpot(index, spotCode, price, type) {
+        const div = document.createElement('div');
+        div.innerHTML = `
+            <input name="Spots[${index}].SpotCode" value="${spotCode}" />
+            <input name="Spots[${index}].PricePerHour" value="${price}" />
+            <input name="Spots[${index}].SpotType" value="${type}" />
+        `;
+        spotsContainer.appendChild(div);
+    }
+
+    form.addEventListener('submit', function () {
+        // Normaliser lat/lng
+        if (latInput && latInput.value) latInput.value = normalizeDecimal(latInput.value);
+        if (lngInput && lngInput.value) lngInput.value = normalizeDecimal(lngInput.value);
+
+        // Lire paramètres auto
+        const lastSectorRaw = (document.getElementById('lastSector').value || 'A').toUpperCase().trim();
+        const spotsPerSector = parseInt(document.getElementById('spotsPerSector').value) || 0;
+        const price = normalizeDecimal(document.getElementById('autoPrice').value);
+        const type = (document.getElementById('autoType').value || '').toString().trim();
+
+        // Nettoyer le container avant génération
+        spotsContainer.innerHTML = '';
+
+        // Validation minimale (si invalide -> aucune place ne sera envoyée)
+        if (!/^[A-Z]$/.test(lastSectorRaw) || lastSectorRaw.charCodeAt(0) < 'A'.charCodeAt(0)) return;
+        if (spotsPerSector <= 0) return;
+
+        const letters = charRange('A', lastSectorRaw);
+        const pad = padSize(spotsPerSector);
+
+        let idx = 0;
+        letters.forEach(letter => {
+            for (let i = 1; i <= spotsPerSector; i++) {
+                const code = letter + i.toString().padStart(pad, '0');
+                addHiddenSpot(idx++, code, price, type);
+            }
+        });
+
+        // NB: pas besoin de réindexer ici car on recrée Spots[0..N-1] proprement
+    });
+</script>

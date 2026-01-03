@@ -1,0 +1,57 @@
+@model auth.ViewModels.Manager.ParkingSpotViewModel
+@{
+    ViewData["Title"] = "Modifier la place";
+    var parkingId = ViewBag.ParkingId as int? ?? 0;
+    var spotId = ViewBag.SpotId as int? ?? 0;
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Modifier la place</h2>
+        <div class="d-flex gap-2">
+            <a class="sp-btn sp-btn-outline" asp-controller="Manager" asp-action="Details" asp-route-id="@parkingId">Retour au parking</a>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <div class="sp-card p-3">
+        <form asp-action="EditSpot" asp-route-spotId="@spotId" method="post" class="disable-on-submit">
+            @Html.AntiForgeryToken()
+
+            <div class="mb-3">
+                <label asp-for="SpotCode" class="form-label">ID de la place (SpotCode)</label>
+                <input asp-for="SpotCode" class="form-control" />
+                <span asp-validation-for="SpotCode" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="PricePerHour" class="form-label">Prix par heure</label>
+                <input asp-for="PricePerHour" class="form-control" type="number" step="0.01" min="0" />
+                <span asp-validation-for="PricePerHour" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="SpotType" class="form-label">Type (optionnel)</label>
+                <input asp-for="SpotType" class="form-control" />
+                <span asp-validation-for="SpotType" class="text-danger"></span>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button class="sp-btn sp-btn-primary" type="submit">Enregistrer</button>
+                <a class="sp-btn sp-btn-outline" asp-controller="Manager" asp-action="Details" asp-route-id="@parkingId">Annuler</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

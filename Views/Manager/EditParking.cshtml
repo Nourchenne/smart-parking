@@ -1,0 +1,103 @@
+@model auth.ViewModels.Manager.EditParkingViewModel
+@{
+    ViewData["Title"] = "Modifier le parking";
+}
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<div class="container py-4">
+    <h2>Modifier le parking</h2>
+
+    <div class="sp-card p-3">
+        <form asp-action="EditParking" method="post" class="disable-on-submit">
+            @Html.AntiForgeryToken()
+            <input asp-for="Id" type="hidden" />
+
+            <div class="mb-3">
+                <label asp-for="Name" class="form-label">Nom</label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Address" class="form-label">Adresse</label>
+                <input asp-for="Address" class="form-control" />
+                <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3 row">
+                <div class="col-md-6">
+                    <label asp-for="LatitudeString" class="form-label">Latitude</label>
+                    <input asp-for="LatitudeString" id="lat" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="LongitudeString" class="form-label">Longitude</label>
+                    <input asp-for="LongitudeString" id="lng" class="form-control" />
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Emplacement sur la carte</label>
+                <div id="map" style="height:320px;border-radius:8px;"></div>
+                <div class="form-text mt-2">Cliquez sur la carte ou déplacez le marqueur pour définir la latitude et la longitude.</div>
+            </div>
+
+            <div class="form-check mb-3">
+                <input asp-for="IsActive" class="form-check-input" />
+                <label asp-for="IsActive" class="form-check-label">Actif</label>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button class="sp-btn sp-btn-primary" type="submit">Enregistrer</button>
+                <a class="sp-btn sp-btn-outline" asp-action="Details" asp-route-id="@Model.Id">Annuler</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    (function(){
+        const defaultLat = 36.8065;
+        const defaultLng = 10.1815;
+        const latInput = document.getElementById('lat');
+        const lngInput = document.getElementById('lng');
+
+        const initLat = latInput && latInput.value ? parseFloat(latInput.value.toString().replace(',', '.')) : defaultLat;
+        const initLng = lngInput && lngInput.value ? parseFloat(lngInput.value.toString().replace(',', '.')) : defaultLng;
+
+        const map = L.map('map').setView([initLat, initLng], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap' }).addTo(map);
+
+        let marker = L.marker([initLat, initLng], { draggable: true }).addTo(map);
+
+        function setInputs(lat, lng) {
+            if (latInput) latInput.value = lat.toFixed(6).replace(/,/g, '.');
+            if (lngInput) lngInput.value = lng.toFixed(6).replace(/,/g, '.');
+        }
+
+        map.on('click', function(e){
+            const lat = e.latlng.lat, lng = e.latlng.lng;
+            marker.setLatLng([lat, lng]);
+            setInputs(lat, lng);
+        });
+
+        marker.on('dragend', function(e){
+            const pos = e.target.getLatLng();
+            setInputs(pos.lat, pos.lng);
+        });
+
+        // ensure inputs normalized on form submit
+        const form = document.querySelector('form[asp-action="EditParking"]') || document.querySelector('form');
+        if (form) {
+            form.addEventListener('submit', function(){
+                if (latInput && latInput.value) latInput.value = latInput.value.toString().replace(/,/g, '.');
+                if (lngInput && lngInput.value) lngInput.value = lngInput.value.toString().replace(/,/g, '.');
+            });
+        }
+    })();
+</script>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

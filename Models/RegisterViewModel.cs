@@ -15,6 +15,7 @@ namespace auth.Models
         [Display(Name = "Mot de passe")]
         public string Password { get; set; } = string.Empty;
 
+        [Required(ErrorMessage = "La confirmation est requise")]
         [DataType(DataType.Password)]
         [Display(Name = "Confirmer le mot de passe")]
         [Compare("Password", ErrorMessage = "Les mots de passe ne correspondent pas")]
@@ -24,7 +25,10 @@ namespace auth.Models
         [StringLength(100)]
         public string? FullName { get; set; }
 
-        [Display(Name = "Rôle")]
-        public string? Role { get; set; }
+        // Choix du type de compte : User ou Manager
+        [Required(ErrorMessage = "Veuillez choisir le type de compte")]
+        [Display(Name = "Type de compte")]
+        [RegularExpression("User|Manager", ErrorMessage = "Type de compte invalide")]
+        public string SelectedRole { get; set; } = "User";
     }
 }

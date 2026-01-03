@@ -1,0 +1,117 @@
+@model auth.ViewModels.ReservationCreateViewModel
+@{
+    ViewData["Title"] = "Créer une réservation";
+    var parking = ViewBag.Parking as auth.Models.Parking;
+    var unavailable = ViewBag.UnavailableSpots as HashSet<int> ?? new HashSet<int>();
+    var canSelect = (bool)(ViewBag.CanSelectSpot ?? false);
+    var startQuery = ViewBag.StartAtQuery as string ?? "";
+    var durationQuery = (int)(ViewBag.DurationQuery ?? 1);
+}
+
+<div class="container mt-4">
+    <h2>Réserver - @parking?.Name</h2>
+
+    <div class="card p-3 mt-3">
+        <p><strong>Adresse:</strong> @parking?.Address</p>
+        <p><strong>Places totales:</strong> @(parking?.Spots?.Count() ?? 0)</p>
+        <p class="text-muted">Choisissez la date/heure de début et la durée — la liste des places disponibles se mettra à jour automatiquement.</p>
+    </div>
+
+    <form id="availabilityForm" method="get" class="mt-3 row g-2">
+        <input type="hidden" name="parkingId" value="@parking?.Id" />
+        <div class="col-md-5">
+            <label class="form-label">Début</label>
+            <input id="startAtInput" name="startAt" class="form-control" type="datetime-local" value="@startQuery" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Durée (h)</label>
+            <input id="durationInput" name="durationHours" class="form-control" type="number" min="1" max="24" value="@durationQuery" />
+        </div>
+        <div class="col-md-4 align-self-end">
+            <!-- No manual button: availability updates automatically when inputs change -->
+        </div>
+    </form>
+
+    <form id="reserveForm" asp-action="Create" method="post" class="mt-3">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="ParkingId" />
+        <input id="hiddenStartAt" type="hidden" asp-for="StartAt" />
+        <input id="hiddenDuration" type="hidden" asp-for="DurationHours" />
+
+        <div class="mb-3">
+            <label class="form-label">Place disponible</label>
+            <div class="d-flex flex-wrap gap-2">
+                @if (parking?.Spots != null)
+                {
+                    var available = parking.Spots.Where(s => s.IsActive && !unavailable.Contains(s.Id)).OrderBy(x => x.SpotCode).ToList();
+                    if (!available.Any())
+                    {
+                        <div class="text-muted">Aucune place disponible pour l'intervalle choisi. Modifiez la date ou la durée.</div>
+                    }
+                    else
+                    {
+                        foreach (var s in available)
+                        {
+                            <div>
+                                <input type="radio" id="spot_@s.Id" name="ParkingSpotId" value="@s.Id" />
+                                <label for="spot_@s.Id" class="btn btn-outline-primary ms-1">@s.SpotCode (@s.PricePerHour.ToString("0.00") €/h)</label>
+                            </div>
+                        }
+                    }
+                }
+            </div>
+            <span asp-validation-for="ParkingSpotId" class="text-danger"></span>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button id="confirmBtn" type="submit" class="btn btn-primary" @(canSelect?"":"disabled")>Confirmer et payer</button>
+            <a class="btn btn-secondary" asp-controller="User" asp-action="Dashboard">Annuler</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        (function(){
+            var startInput = document.getElementById('startAtInput');
+            var durationInput = document.getElementById('durationInput');
+            var availabilityForm = document.getElementById('availabilityForm');
+            var reserveForm = document.getElementById('reserveForm');
+            var hiddenStart = document.getElementById('hiddenStartAt');
+            var hiddenDuration = document.getElementById('hiddenDuration');
+
+            // Initialize hidden fields
+            function syncHidden() {
+                if (startInput && hiddenStart) hiddenStart.value = startInput.value;
+                if (durationInput && hiddenDuration) hiddenDuration.value = durationInput.value;
+            }
+            syncHidden();
+
+            // Debounce helper
+            function debounce(fn, delay) {
+                var t;
+                return function() {
+                    var args = arguments;
+                    clearTimeout(t);
+                    t = setTimeout(function(){ fn.apply(null, args); }, delay);
+                }
+            }
+
+            // Auto-submit availability form when inputs change
+            var submitAvailability = debounce(function(){
+                // Only submit if start has value
+                if (!startInput.value) return;
+                // navigate to same page with query string; using form.submit() keeps method=get
+                availabilityForm.submit();
+            }, 700);
+
+            if (startInput) startInput.addEventListener('change', function(){ syncHidden(); submitAvailability(); });
+            if (durationInput) durationInput.addEventListener('input', function(){ syncHidden(); submitAvailability(); });
+
+            // Before submitting reserveForm copy visible inputs to hidden ones
+            if (reserveForm) {
+                reserveForm.addEventListener('submit', function(){ syncHidden(); });
+            }
+        })();
+    </script>
+}

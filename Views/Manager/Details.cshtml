@@ -1,0 +1,189 @@
+@model auth.Models.Parking
+@{
+    ViewData["Title"] = "Gérer parking";
+    var newSpot = ViewBag.NewSpot as auth.ViewModels.Manager.ParkingSpotViewModel ?? new auth.ViewModels.Manager.ParkingSpotViewModel();
+    var reservations = ViewBag.Reservations as List<auth.ViewModels.Manager.ManagerReservationViewModel> ?? new List<auth.ViewModels.Manager.ManagerReservationViewModel>();
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-start mb-3">
+        <div>
+            <h2 class="mb-1">@Model.Name</h2>
+            <div class="text-muted">@Model.Address</div>
+            <div class="small text-muted">Coordonnées : @Model.Latitude , @Model.Longitude</div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <a class="sp-btn sp-btn-light"
+               asp-controller="Manager" asp-action="Reservations"
+               asp-route-parkingId="@Model.Id" asp-route-day="@DateTime.Today.ToString("yyyy-MM-dd")">
+                <i class="bi bi-calendar2-week"></i> Réservations
+            </a>
+            <a class="sp-btn sp-btn-outline" asp-controller="Manager" asp-action="Dashboard">
+                Retour
+            </a>
+            <a class="sp-btn sp-btn-primary" asp-controller="Manager" asp-action="EditParking" asp-route-id="@Model.Id">Modifier le parking</a>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <div class="row g-3">
+        <div class="col-lg-4">
+            <div class="sp-card p-3">
+                <h5 class="mb-2">Ajouter une place</h5>
+
+                <form asp-action="AddSpot" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="parkingId" value="@Model.Id" />
+
+                    <div class="mb-3">
+                        <label class="form-label">ID de la place (SpotCode)</label>
+                        <input class="form-control" name="SpotCode" maxlength="50" value="@newSpot.SpotCode" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Prix par heure (TND)</label>
+                        <input class="form-control" name="PricePerHour" type="number" step="0.01" min="0" value="@newSpot.PricePerHour" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Type (optionnel)</label>
+                        <input class="form-control" name="SpotType" maxlength="30" value="@newSpot.SpotType" />
+                    </div>
+
+                    <button class="sp-btn sp-btn-primary w-100" type="submit">
+                        <i class="bi bi-plus-circle"></i> Ajouter
+                    </button>
+                </form>
+
+                <p class="text-muted small mt-3 mb-0">
+                    Remarque : SpotCode doit être unique dans ce parking (A01 ne peut pas être répété).
+                </p>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="sp-card p-3 mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 class="mb-0">Places</h5>
+                    <span class="badge bg-dark">Total: @Model.Spots.Count</span>
+                </div>
+
+                @if (!Model.Spots.Any())
+                {
+                <div class="text-center py-4">
+                    <i class="bi bi-p-square display-6 text-muted"></i>
+                    <p class="text-muted mt-2 mb-0">Aucune place. Ajoute ta première place.</p>
+                </div>
+                }
+                else
+                {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>SpotCode</th>
+                                <th>Type</th>
+                                <th>Prix/heure</th>
+                                <th>Active</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var s in Model.Spots.OrderBy(x => x.SpotCode))
+                                {
+                            <tr>
+                                <td class="fw-bold">@s.SpotCode</td>
+                                <td>@(string.IsNullOrWhiteSpace(s.SpotType) ? "-" : s.SpotType)</td>
+                                <td>@s.PricePerHour.ToString("0.00")</td>
+                                <td>
+                                    <span class="badge @(s.IsActive ? "bg-success" : "bg-secondary")">
+                                        @(s.IsActive ? "Oui" : "Non")
+                                    </span>
+                                </td>
+                                <td class="d-flex gap-2">
+                                    <a class="sp-btn sp-btn-outline" asp-controller="Manager" asp-action="EditSpot" asp-route-id="@s.Id">Modifier</a>
+                                    <form asp-controller="Manager" asp-action="ToggleSpotActive" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="spotId" value="@s.Id" />
+                                        <button class="sp-btn sp-btn-light" type="submit">@(s.IsActive ? "Désactiver" : "Activer")</button>
+                                    </form>
+                                    <form asp-controller="Manager" asp-action="DeleteSpot" method="post" class="d-inline" onsubmit="return confirm('Supprimer cette place ?');">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="spotId" value="@s.Id" />
+                                        <button class="sp-btn sp-btn-primary" type="submit">Supprimer</button>
+                                    </form>
+                                </td>
+                            </tr>
+                                }
+                        </tbody>
+                    </table>
+                </div>
+                }
+            </div>
+
+            <div class="sp-card p-3">
+                <h5>Historique des réservations</h5>
+                <form method="get" asp-action="Details" class="row g-2 mb-3">
+                    <input type="hidden" name="id" value="@Model.Id" />
+                    <div class="col-md-4">
+                        <label class="form-label">Jour</label>
+                        <input type="date" name="day" class="form-control" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">SpotCode</label>
+                        <input type="text" name="spotCode" class="form-control" placeholder="Ex: A01" />
+                    </div>
+                    <div class="col-md-4 align-self-end">
+                        <button class="sp-btn sp-btn-primary" type="submit">Filtrer</button>
+                    </div>
+                </form>
+
+                @if (!reservations.Any())
+                {
+                    <div class="text-center py-4 text-muted">Aucune réservation trouvée.</div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Place</th>
+                                    <th>Début</th>
+                                    <th>Fin</th>
+                                    <th>Durée</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var r in reservations)
+                                {
+                                    <tr>
+                                        <td>@r.UserEmail</td>
+                                        <td>@r.SpotCode</td>
+                                        <td>@r.StartAt.ToString("g")</td>
+                                        <td>@r.EndAt.ToString("g")</td>
+                                        <td>@r.DurationHours</td>
+                                        <td>@r.TotalPrice.ToString("0.00")</td>
+                                        <td><span class="badge @(r.Status=="Confirmed"?"bg-success":"bg-secondary")">@r.Status</span></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

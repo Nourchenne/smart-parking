@@ -1,0 +1,93 @@
+@model auth.Models.ContactViewModel
+@{
+    ViewData["Title"] = "Contact";
+}
+
+<section class="sp-section">
+    <div class="container">
+        <div class="sp-section-header">
+            <h2>Contact</h2>
+            <p>Une question ? Un problème ? Envoyez-nous un message.</p>
+        </div>
+
+        <div class="row g-4 align-items-stretch">
+            <div class="col-lg-5">
+                <div class="sp-card" style="height:100%;">
+                    <div class="sp-card-icon"><i class="bi bi-headset"></i></div>
+                    <h3>Support Smart Parking</h3>
+                    <p class="text-center">Nous répondons généralement en moins de 24h (projet scolaire/démo).</p>
+
+                    <hr />
+
+                    <div class="d-grid gap-2">
+                        <div class="d-flex gap-2 align-items-center">
+                            <i class="bi bi-envelope"></i>
+                            <span>support@smartparking.local</span>
+                        </div>
+                        <div class="d-flex gap-2 align-items-center">
+                            <i class="bi bi-geo-alt"></i>
+                            <span>Tunisie • Démo locale</span>
+                        </div>
+                        <div class="d-flex gap-2 align-items-center">
+                            <i class="bi bi-clock"></i>
+                            <span>Lun–Ven • 09:00–18:00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-7">
+                <div class="card shadow-sm border-0" style="border-radius:16px;">
+                    <div class="card-body p-4">
+                        <h4 class="mb-3"><i class="bi bi-send"></i> Envoyer un message</h4>
+
+                        <form asp-action="Contact" method="post">
+                            @Html.AntiForgeryToken()
+                            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label asp-for="FullName" class="form-label"></label>
+                                    <input asp-for="FullName" class="form-control" placeholder="Votre nom complet" />
+                                    <span asp-validation-for="FullName" class="text-danger"></span>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label asp-for="Email" class="form-label"></label>
+                                    <input asp-for="Email" class="form-control" placeholder="ex: nom@email.com" />
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+
+                                <div class="col-12">
+                                    <label asp-for="Subject" class="form-label"></label>
+                                    <input asp-for="Subject" class="form-control" placeholder="Sujet du message" />
+                                    <span asp-validation-for="Subject" class="text-danger"></span>
+                                </div>
+
+                                <div class="col-12">
+                                    <label asp-for="Message" class="form-label"></label>
+                                    <textarea asp-for="Message" class="form-control" rows="6" placeholder="Écrivez votre message..."></textarea>
+                                    <span asp-validation-for="Message" class="text-danger"></span>
+                                </div>
+
+                                <div class="col-12 d-flex gap-2">
+                                    <button type="submit" class="sp-btn sp-btn-primary">
+                                        <i class="bi bi-send-fill"></i> Envoyer
+                                    </button>
+                                    <a asp-controller="Home" asp-action="Index" class="sp-btn sp-btn-outline" style="border-color:#ddd;color:#111;">
+                                        Retour
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

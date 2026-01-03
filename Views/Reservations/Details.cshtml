@@ -1,0 +1,31 @@
+@model auth.Models.Reservation
+@using auth.Models
+
+@{
+    ViewData["Title"] = "Détails réservation";
+}
+
+<div class="container mt-4">
+    <h2>Réservation #@Model.Id</h2>
+
+    <div class="card p-3 mt-3">
+        <p><b>Parking :</b> @Model.Parking?.Name ?? @Model.ParkingSpot?.Parking?.Name</p>
+        <p><b>Place :</b> @Model.ParkingSpot?.SpotCode</p>
+        <p><b>Date/Heure :</b> @Model.StartAt.ToString("g")</p>
+        <p><b>Durée :</b> @Model.DurationHours h</p>
+        <p><b>Total :</b> @Model.TotalPrice.ToString("0.00") €</p>
+        <p><b>Status :</b> @Model.Status</p>
+    </div>
+
+    @if (Model.Status == ReservationStatus.PendingPayment)
+    {
+    <div class="mt-3">
+        <a class="btn btn-primary"
+           asp-controller="Payment"
+           asp-action="Pay"
+           asp-route-reservationId="@Model.Id">
+            Payer (Simulation)
+        </a>
+    </div>
+    }
+</div>

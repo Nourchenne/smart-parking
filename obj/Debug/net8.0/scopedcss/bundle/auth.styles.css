@@ -1,49 +1,80 @@
 /* _content/auth/Views/Shared/_Layout.cshtml.rz.scp.css */
-/* Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-for details on configuring this project to bundle and minify static web assets. */
+<!DOCTYPE html >
+<html lang="fr" >
+<head >
+<meta charset="utf-8" / >
+<meta name="viewport" content="width=device-width, initial-scale=1.0" / >
+<title > @ViewData["Title"] - Smart Parking</title >
 
-a.navbar-brand[b-nwjveq89mo] {
-  white-space: normal;
-  text-align: center;
-  word-break: break-all;
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" >
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" >
+
+<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" / >
+</head >
+
+<body >
+<header >
+<nav class="navbar navbar-expand-sm navbar-dark site-navbar" role="navigation" aria-label="Barre de navigation principale" >
+<div class="container-fluid" >
+<a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index" >
+<i class="bi bi-speedometer2" > </i > Smart Parking
+</a >
+
+<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Basculer la navigation" >
+<span class="navbar-toggler-icon" > </span >
+</button >
+
+<div class="collapse navbar-collapse" id="mainNav" >
+<ul class="navbar-nav me-auto mb-2 mb-md-0" >
+<li class="nav-item" >
+<a class="nav-link" asp-controller="Home" asp-action="Index" > <i class="bi bi-house" > </i > Accueil</a >
+</li >
+<!-- Si tu utilises encore Products comme "Parkings" temporairement -->
+<li class="nav-item" >
+<a class="nav-link" asp-controller="Products" asp-action="Index" > <i class="bi bi-p-square" > </i > Parkings</a >
+</li >
+
+<li class="nav-item" >
+<a class="nav-link" asp-controller="Home" asp-action="About" > <i class="bi bi-info-circle" > </i > À propos</a >
+</li >
+<!-- ✅ MENU MANAGER -->
+@if (User.Identity?.IsAuthenticated == true && User.IsInRole("Manager"))[b-nwjveq89mo] {
+    <li class="nav-item"> <a class="nav-link" asp-controller="Manager" asp-action="Dashboard"> <i class="bi bi-speedometer"></i> Dashboard Manager </a> </li>
 }
 
-a[b-nwjveq89mo] {
-  color: #0077cc;
+<!-- ✅ MENU SUPERADMIN -->
+@if (User.Identity?.IsAuthenticated == true && User.IsInRole("SuperAdmin"))[b-nwjveq89mo] {
+    <li class="nav-item"> <a class="nav-link" asp-controller="SuperAdmin" asp-action="Index"> <i class="bi bi-shield-lock"></i> Admin Panel </a> </li>
 }
 
-.btn-primary[b-nwjveq89mo] {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+</ul >
+
+<ul class="navbar-nav ms-auto" >
+@if (User.Identity?.IsAuthenticated == true)[b-nwjveq89mo] {
+    <li class="nav-item dropdown"> <a class="nav-link dropdown-toggle" href="#" id="userMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false"> <i class="bi bi-person-circle"></i> @User.Identity.Name </a> <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+    <!-- Si tu n'as pas /Account/Manage encore, supprime cette ligne --> <li><a class="dropdown-item" asp-controller="Account" asp-action="Manage">Mon compte</a></li> <li><hr class="dropdown-divider" /></li> <li> <form asp-controller="Account" asp-action="Logout" method="post" class="px-3"> @Html.AntiForgeryToken() <button class="btn btn-sm btn-logout w-100" type="submit">Se déconnecter</button> </form> </li> </ul> </li>
 }
 
-.nav-pills .nav-link.active[b-nwjveq89mo], .nav-pills .show > .nav-link[b-nwjveq89mo] {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+else[b-nwjveq89mo] {
+    <li class="nav-item"><a class="nav-link" asp-controller="Account" asp-action="Login">Connexion</a></li> <li class="nav-item"><a class="nav-link" asp-controller="Account" asp-action="Register">Inscription</a></li>
 }
 
-.border-top[b-nwjveq89mo] {
-  border-top: 1px solid #e5e5e5;
-}
-.border-bottom[b-nwjveq89mo] {
-  border-bottom: 1px solid #e5e5e5;
+</ul >
+</div >
+</div >
+</nav >
+</header >
+
+<main class="container py-4" >
+<main role="main" class="pb-3" >
+
+@if (TempData["SuccessMessage"] != null)[b-nwjveq89mo] {
+    <div class="alert alert-success alert-dismissible fade show" role="alert"> @TempData["SuccessMessage"] <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button> </div>
 }
 
-.box-shadow[b-nwjveq89mo] {
-  box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+@if (TempData["ErrorMessage"] != null) {
+    <div class="alert alert-danger alert-dismissible fade show" role="alert"> @TempData["ErrorMessage"] <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button> </div>
 }
 
-button.accept-policy[b-nwjveq89mo] {
-  font-size: 1rem;
-  line-height: inherit;
-}
-
-.footer[b-nwjveq89mo] {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  white-space: nowrap;
-  line-height: 60px;
-}
+@RenderBody() </main> </main> <footer class="site-footer mt-5"> <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-2"> <div>&copy;
+@DateTime.Now.Year - Smart Parking</div> <div class="d-flex gap-3 align-items-center"> <a asp-controller="Home" asp-action="Privacy">Privacy</a> <a asp-controller="Home" asp-action="Contact">Contact</a> <a href="#" aria-label="Twitter" class="text-decoration-none text-muted"><i class="bi bi-twitter"></i></a> <a href="#" aria-label="Github" class="text-decoration-none text-muted"><i class="bi bi-github"></i></a> </div> </div> </footer> <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> <script src="~/js/site.js" asp-append-version="true"></script> @await RenderSectionAsync("Scripts", required: false) </body> </html>

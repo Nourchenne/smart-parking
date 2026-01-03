@@ -1,0 +1,36 @@
+@model auth.ViewModels.ReservationCreateViewModel
+
+@{
+    ViewData["Title"] = "Paiement";
+    var parking = ViewBag.Parking as auth.Models.Parking;
+    var spot = ViewBag.Spot as auth.Models.ParkingSpot;
+    var total = ViewBag.Total as decimal? ?? 0m;
+}
+
+<div class="container py-4">
+    <div class="card p-3">
+        <h4 class="mb-3">Paiement (Mock)</h4>
+
+        <p class="mb-2">Parking : <strong>@parking?.Name</strong></p>
+        <p class="mb-2">Place : <strong>@spot?.SpotCode</strong></p>
+        <p class="mb-3">Total : <strong>@total.ToString("0.00") TND</strong></p>
+
+        <form asp-controller="Reservations" asp-action="ConfirmPayment" method="post">
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" name="ParkingId" value="@Model.ParkingId" />
+            <input type="hidden" name="ParkingSpotId" value="@Model.ParkingSpotId" />
+            <input type="hidden" name="StartAt" value="@Model.StartAt.ToString("o")" />
+            <input type="hidden" name="DurationHours" value="@Model.DurationHours" />
+
+            <button class="btn btn-success" type="submit">Payer et confirmer</button>
+
+            <a class="btn btn-outline-secondary ms-2"
+               asp-controller="Reservations"
+               asp-action="Details"
+               asp-route-parkingId="@Model.ParkingId">
+                Annuler
+            </a>
+        </form>
+    </div>
+</div>

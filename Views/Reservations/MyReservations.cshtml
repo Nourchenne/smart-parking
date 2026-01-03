@@ -1,0 +1,79 @@
+@using System.Linq
+@model List<auth.Models.Reservation>
+
+@{
+    ViewData["Title"] = "Mes réservations";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0">Mes réservations</h2>
+        <a class="sp-btn sp-btn-light" asp-controller="User" asp-action="Dashboard">Retour</a>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="card p-4 text-center">
+            <p class="mb-0">Vous n'avez aucune réservation.</p>
+        </div>
+    }
+    else
+    {
+        <div class="card p-3">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Parking</th>
+                            <th>Place</th>
+                            <th>Début</th>
+                            <th>Fin</th>
+                            <th>Durée (h)</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var r in Model)
+                        {
+                        <tr>
+                            <td>@r.Parking?.Name</td>
+                            <td>@r.ParkingSpot?.SpotCode</td>
+                            <td>@r.StartAt.ToString("g")</td>
+                            <td>@r.EndAt.ToString("g")</td>
+                            <td>@r.DurationHours</td>
+                            <td>@r.TotalPrice.ToString("0.00")</td>
+                            <td>
+                                <span class="badge @(r.Status == auth.Models.ReservationStatus.Confirmed ? "bg-success" : "bg-secondary")">
+                                    @r.Status
+                                </span>
+                            </td>
+                            <td>
+                                <a class="sp-btn sp-btn-outline" asp-action="Details" asp-route-id="@r.Id">Voir détails</a>
+                                @if (r.Payment != null && r.Payment.Status == auth.Models.PaymentStatus.Paid)
+                                {
+                                    <a class="sp-btn sp-btn-primary ms-2" asp-controller="Payment" asp-action="DownloadReceipt" asp-route-reservationId="@r.Id">Télécharger reçu</a>
+                                }
+                                else if (r.Status == auth.Models.ReservationStatus.PendingPayment)
+                                {
+                                    <a class="sp-btn sp-btn-primary ms-2" asp-controller="Payment" asp-action="Pay" asp-route-reservationId="@r.Id">Payer</a>
+                                }
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>

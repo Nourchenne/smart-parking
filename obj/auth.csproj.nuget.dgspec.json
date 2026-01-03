@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Raouia Ben Ncib\\source\\repos\\auth\\auth\\auth.csproj": {}
+    "C:\\Users\\nourc\\auth-crud-.NetCore\\auth.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Raouia Ben Ncib\\source\\repos\\auth\\auth\\auth.csproj": {
+    "C:\\Users\\nourc\\auth-crud-.NetCore\\auth.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Raouia Ben Ncib\\source\\repos\\auth\\auth\\auth.csproj",
+        "projectUniqueName": "C:\\Users\\nourc\\auth-crud-.NetCore\\auth.csproj",
         "projectName": "auth",
-        "projectPath": "C:\\Users\\Raouia Ben Ncib\\source\\repos\\auth\\auth\\auth.csproj",
-        "packagesPath": "C:\\Users\\Raouia Ben Ncib\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Raouia Ben Ncib\\source\\repos\\auth\\auth\\obj\\",
+        "projectPath": "C:\\Users\\nourc\\auth-crud-.NetCore\\auth.csproj",
+        "packagesPath": "C:\\Users\\nourc\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\nourc\\auth-crud-.NetCore\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\Raouia Ben Ncib\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\nourc\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -26,7 +26,6 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -86,6 +85,14 @@
               "suppressParent": "All",
               "target": "Package",
               "version": "[8.0.0, )"
+            },
+            "QuestPDF": {
+              "target": "Package",
+              "version": "[2024.1.0, )"
+            },
+            "Stripe.net": {
+              "target": "Package",
+              "version": "[50.1.0, )"
             }
           },
           "imports": [

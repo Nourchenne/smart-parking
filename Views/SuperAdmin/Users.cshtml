@@ -1,0 +1,54 @@
+@model List<auth.ViewModels.SuperAdmin.UserSummaryViewModel>
+@{
+    ViewData["Title"] = "Gérer les utilisateurs";
+    var currentEmail = User?.Identity?.Name ?? "";
+}
+
+<div class="container py-4">
+    <h2 class="mb-3">Utilisateurs</h2>
+
+    <div class="sp-card p-3">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th>Roles</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var u in Model)
+                    {
+                        <tr>
+                            <td>@u.Email</td>
+                            <td>@string.Join(", ", u.Roles)</td>
+                            <td>@(u.IsLocked ? "Bloqué" : "Actif")</td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <form method="post" asp-action="ToggleLock" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="userId" value="@u.Id" />
+                                        <button class="sp-btn sp-btn-primary" type="submit" title="Activer / Désactiver">
+                                            @(u.IsLocked ? "Activer" : "Désactiver")
+                                        </button>
+                                    </form>
+
+                                    @if (!string.Equals(u.Email, currentEmail, StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        <form method="post" asp-action="DeleteUser" class="d-inline" onsubmit="return confirm('Supprimer cet utilisateur ?');">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="userId" value="@u.Id" />
+                                            <button class="sp-btn sp-btn-light" type="submit" title="Supprimer utilisateur">Supprimer</button>
+                                        </form>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

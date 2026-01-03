@@ -1,0 +1,38 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.cache
+*.log
+
+# Build artifacts
+bin/
+obj/
+
+# Rider
+.idea/
+
+# Node
+node_modules/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Visual Studio Code
+.vscode/
+
+# Local settings
+appsettings.*.json
+
+# JetBrains
+*.iml
+
+# Temporary
+*.tmp
+
+# Ignore FileContentIndex and other VS index files
+.vs/**/FileContentIndex/
+
+# Keep .gitignore tracked
+

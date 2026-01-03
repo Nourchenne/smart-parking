@@ -1,0 +1,50 @@
+@model List<auth.ViewModels.SuperAdmin.ReservationSummaryViewModel>
+@{
+    ViewData["Title"] = "Toutes les réservations - SuperAdmin";
+}
+
+<div class="container py-4">
+    <h2 class="mb-3">Réservations</h2>
+
+    <div class="sp-card p-3">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Parking</th>
+                        <th>Place</th>
+                        <th>Utilisateur</th>
+                        <th>Début</th>
+                        <th>Fin</th>
+                        <th>Durée</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in Model)
+                    {
+                        <tr>
+                            <td>@r.ParkingName</td>
+                            <td>@r.SpotCode</td>
+                            <td>@r.UserEmail</td>
+                            <td>@r.StartAt.ToString("g")</td>
+                            <td>@r.EndAt.ToString("g")</td>
+                            <td>@r.DurationHours</td>
+                            <td>@r.TotalPrice.ToString("0.00")</td>
+                            <td><span class="badge @(r.Status=="Confirmed"?"bg-success":"bg-secondary")">@r.Status</span></td>
+                            <td>
+                                <form method="post" asp-action="DeleteReservation" onsubmit="return confirm('Supprimer cette réservation ?');">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@r.Id" />
+                                    <button class="sp-btn sp-btn-light">Supprimer</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
